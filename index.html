@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grading System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .header i {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 1.5rem;
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            border-right: 1px solid #eee;
+        }
+
+        .results-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .result-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .result-value {
+            font-weight: 500;
+        }
+
+        .grade {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .grade-Aplus {
+            color: #00c853;
+        }
+
+        .grade-A {
+            color: #64dd17;
+        }
+
+        .grade-B {
+            color: #ffab00;
+        }
+
+        .grade-C {
+            color: #ff9100;
+        }
+
+        .grade-D {
+            color: #ff6d00;
+        }
+
+        .grade-F {
+            color: #ff3d00;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+        }
+
+        .export-btn {
+            background: linear-gradient(to right, #4ecdc4, #6ff7ea);
+            color: #333;
+        }
+
+        .export-btn:hover {
+            box-shadow: 0 7px 15px rgba(78, 201, 193, 0.4);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+
+        .clear-btn:hover {
+            box-shadow: 0 7px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .results-table th, .results-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .results-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .results-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .grade-scale {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+
+        .grade-scale h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .grade-scale ul {
+            list-style-type: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .grade-scale li {
+            margin-bottom: 5px;
+            width: 48%;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .form-section {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .grade-scale ul {
+                flex-direction: column;
+            }
+            
+            .grade-scale li {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> Student Grading System</h1>
+            <p>Enter student details to calculate the grade and export to Excel</p>
+            <i class="fas fa-chart-line"></i>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <div class="alert" id="alert"></div>
+                
+                <div class="input-group">
+                    <label for="studentName"><i class="fas fa-user"></i> Student Name</label>
+                    <input type="text" id="studentName" placeholder="Enter student name">
+                </div>
+                
+                <div class="input-group">
+                    <label for="studentMarks"><i class="fas fa-percent"></i> Marks (out of 100)</label>
+                    <input type="number" id="studentMarks" min="0" max="100" placeholder="Enter marks (0-100)">
+                </div>
+                
+                <button id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Grade</button>
+                
+                <div class="result-container" id="resultContainer">
+                    <div class="result-title">--- Student Result ---</div>
+                    <div class="result-details">
+                        <div class="result-item">
+                            <span class="result-label">Name:</span>
+                            <span class="result-value" id="resultName"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Marks:</span>
+                            <span class="result-value" id="resultMarks"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Grade:</span>
+                            <span class="result-value grade" id="resultGrade"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="export-btn" id="exportBtn"><i class="fas fa-file-excel"></i> Export to Excel</button>
+                    <button class="clear-btn" id="clearBtn"><i class="fas fa-trash"></i> Clear All</button>
+                </div>
+                
+                <div class="grade-scale">
+                    <h3>Grading Scale</h3>
+                    <ul>
+                        <li>90-100: A+</li>
+                        <li>80-89: A</li>
+                        <li>70-79: B</li>
+                        <li>60-69: C</li>
+                        <li>50-59: D</li>
+                        <li>Below 50: F</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <h2><i class="fas fa-list"></i> All Results</h2>
+                <button id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh Results</button>
+                
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Marks</th>
+                            <th>Grade</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <!-- Results will be populated here -->
+                    </tbody>
+                </table>
+                <p id="noResults" style="text-align: center; margin-top: 20px; color: #666; display: none;">
+                    No results yet. Calculate some grades to see them here.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use relative URLs since we're serving from the same origin
+        const API_BASE = '';
+        
+        // DOM Elements
+        const calculateBtn = document.getElementById('calculateBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const alertDiv = document.getElementById('alert');
+        const resultsTable = document.getElementById('resultsTable');
+        const resultsBody = document.getElementById('resultsBody');
+        const noResults = document.getElementById('noResults');
+        
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Calculate grade
+        calculateBtn.addEventListener('click', async function() {
+            const name = document.getElementById('studentName').value.trim();
+            const marks = parseFloat(document.getElementById('studentMarks').value);
+            
+            // Validate inputs
+            if (!name) {
+                showAlert('Please enter student name', 'error');
+                return;
+            }
+            
+            if (isNaN(marks) || marks < 0 || marks > 100) {
+                showAlert('Please enter valid marks between 0 and 100', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/calculate_grade`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, marks })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Display result
+                    document.getElementById('resultName').textContent = result.name;
+                    document.getElementById('resultMarks').textContent = result.marks;
+                    document.getElementById('resultGrade').textContent = result.grade;
+                    
+                    // Set grade color
+                    const gradeElement = document.getElementById('resultGrade');
+                    gradeElement.className = 'result-value grade';
+                    gradeElement.classList.add(`grade-${result.grade.replace('+', 'plus')}`);
+                    
+                    // Show result container
+                    document.getElementById('resultContainer').style.display = 'block';
+                    
+                    showAlert('Grade calculated successfully!', 'success');
+                    
+                    // Refresh results table
+                    refreshResults();
+                } else {
+                    showAlert(result.error || 'An error occurred', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Failed to connect to server. Please make sure the backend is running.', 'error');
+            }
+        });
+        
+        // Export to Excel
+        exportBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch(`${API_BASE}/export_excel`);
+                
+                if (response.ok) {
+                    // Create blob and download
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `student_grades_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    
+                    showAlert('Excel file downloaded successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Failed to export Excel file', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Failed to connect to server. Please make sure the backend is running.', 'error');
+            }
+        });
+        
+        // Clear all results
+        clearBtn.addEventListener('click', async function() {
+            if (confirm('Are you sure you want to clear all results?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/clear_results`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        showAlert('All results cleared successfully!', 'success');
+                        refreshResults();
+                    } else {
+                        showAlert('Failed to clear results', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('Failed to connect to server', 'error');
+                }
+            }
+        });
+        
+        // Refresh results table
+        refreshBtn.addEventListener('click', refreshResults);
+        
+        // Function to refresh results table
+        async function refreshResults() {
+            try {
+                const response = await fetch(`${API_BASE}/get_results`);
+                const results = await response.json();
+                
+                if (response.ok) {
+                    // Clear table body
+                    resultsBody.innerHTML = '';
+                    
+                    if (results.length > 0) {
+                        // Populate table
+                        results.forEach(result => {
+                            const row = document.createElement('tr');
+                            
+                            const nameCell = document.createElement('td');
+                            nameCell.textContent = result.name;
+                            
+                            const marksCell = document.createElement('td');
+                            marksCell.textContent = result.marks;
+                            
+                            const gradeCell = document.createElement('td');
+                            gradeCell.textContent = result.grade;
+                            gradeCell.className = `grade grade-${result.grade.replace('+', 'plus')}`;
+                            
+                            const timeCell = document.createElement('td');
+                            timeCell.textContent = result.timestamp;
+                            
+                            row.appendChild(nameCell);
+                            row.appendChild(marksCell);
+                            row.appendChild(gradeCell);
+                            row.appendChild(timeCell);
+                            
+                            resultsBody.appendChild(row);
+                        });
+                        
+                        resultsTable.style.display = 'table';
+                        noResults.style.display = 'none';
+                    } else {
+                        resultsTable.style.display = 'none';
+                        noResults.style.display = 'block';
+                    }
+                } else {
+                    showAlert('Failed to fetch results', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Failed to connect to server', 'error');
+            }
+        }
+        
+        // Initial load of results
+        refreshResults();
+    </script>
+</body>
+</html>
